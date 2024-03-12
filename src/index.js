@@ -8,6 +8,7 @@ import { debounce } from 'debounce';
  * @property {string} service - service name
  * @property {string} url - source URL of embedded content
  * @property {string} embed - URL to source embed page
+ * @property {object} additionalData - additional data
  * @property {number} [width] - embedded content width
  * @property {number} [height] - embedded content height
  * @property {string} [caption] - content caption
@@ -64,13 +65,14 @@ export default class Embed {
    * @param {number} [data.height] - iframe height
    * @param {number} [data.width] - iframe width
    * @param {string} [data.caption] - caption
+   * @param {string} [data.additionalData] - additionalData
    */
   set data(data) {
     if (!(data instanceof Object)) {
       throw Error('Embed Tool data should be object');
     }
 
-    const { service, source, embed, width, height, caption = '' } = data;
+    const { service, source, embed, width, height, caption = '', additionalData = {} } = data;
 
     this._data = {
       service: service || this.data.service,
@@ -79,6 +81,7 @@ export default class Embed {
       width: width || this.data.width,
       height: height || this.data.height,
       caption: caption || this.data.caption || '',
+      additionalData: additionalData || this.data.additionalData || {},
     };
 
     const oldView = this.element;
@@ -240,11 +243,12 @@ export default class Embed {
       })
       .filter(([key, service]) => Embed.checkServiceConfig(service))
       .map(([key, service]) => {
-        const { regex, embedUrl, html, height, width, id } = service;
+        const { regex, embedUrl, additionalData, html, height, width, id } = service;
 
         return [key, {
           regex,
           embedUrl,
+          additionalData,
           html,
           height,
           width,
